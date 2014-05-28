@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-$path = realpath('./html/require.php');
+$path = realpath('../html/require.php');
 require_once($path);
 require_once CLASS_REALDIR . 'pages/admin/ownersstore/LC_Page_Admin_OwnersStore.php';
 
@@ -54,5 +54,24 @@ function installPlugin($key) {
     if ($objOwner->registerData($arrPluginInfo) === false) {
         return '※ DB登録に失敗しました。' . "\n";
     }
+
+    // プラグイン情報を取得
+    $plugin = SC_Plugin_Util_Ex::getPluginByPluginCode($arrPluginInfo['PLUGIN_CODE']);
+
+    // クラスファイルを読み込み.
+    $plugin_class_file_path = $objOwner->getPluginFilePath($plugin['plugin_code'], $plugin['class_name']);
+    $arrErr = $objOwner->requirePluginFile($plugin_class_file_path, $key);
+    if ($objOwner->isError($arrErr) === true) {
+        return $arrErr;
+    }
+    // プラグインhtmlディレクトリ作成
+    $plugin_html_dir_path = $objOwner->getHtmlPluginDir($plugin['plugin_code']);
+    $objOwner->makeDir($plugin_html_dir_path);
+
+    $arrErr = $objOwner->execPlugin($plugin, $plugin['class_name'], 'install');
+    if ($objOwner->isError($arrErr) === true) {
+        return $arrErr;
+    }
+
     return $arrPluginInfo['PLUGIN_NAME'] . 'のインストールに成功しました。' . "\n";
 }

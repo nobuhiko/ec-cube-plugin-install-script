@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-$path = realpath('./html/require.php');
+$path = realpath('../html/require.php');
 require_once($path);
 
 $d = dir(constant("PLUGIN_UPLOAD_REALDIR"));

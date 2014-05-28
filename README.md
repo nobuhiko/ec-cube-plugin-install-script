@@ -3,7 +3,7 @@ EC-CUBEのプラグインは開発時にファイルの共有がツライので�
 
 
 ### 使い方 ###
-plugin_install.phpとscript.phpをhtmlディレクトリと同じ階層に設置する
+htmlディレクトリと同じ階層にディレクトリごと設置する
 コマンドラインからplugin_install.phpを実行する
 
 ```
