@@ -10,5 +10,15 @@ EC-CUBEのプラグインは開発時にファイルの共有がツライので�
 php plugin_install.php
 ```
 
-それだけ！
+
+### 引数 ###
+-f[plugin_code] 指定したpluginのみインストールする
+```
+php plugin_install.php -f[plugin_code]
+```
+
+-e インストール後、プラグインを有効にする
+```
+php plugin_install.php -e
+```
 

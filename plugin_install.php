@@ -23,19 +23,24 @@ $path = realpath('../html/require.php');
 require_once($path);
 require_once CLASS_REALDIR . 'pages/admin/ownersstore/LC_Page_Admin_OwnersStore.php';
 
-if (isset($argv[1])) {
-    print_r(installPlugin($argv[1]));
+// -f[ファイル名] 指定したファイルをインストールする
+// -e インストール後、有効にする
+$options = getopt("f:e");
+
+if (isset($options['f'])) {
+    print_r(installPlugin($options['f'], isset($options['e'])));
 } else {
     $d = dir(constant("PLUGIN_UPLOAD_REALDIR"));
+    $enable_option = isset($options['e']) ? '-e' : '';
     while (false !== ($filename = $d->read())) {
         if ($filename != '.' && $filename != '..'){
-            system("php plugin_install.php $filename");
+            system("php plugin_install.php -f$filename $enable_option");
         }
     }
 }
+exit;
 
-
-function installPlugin($key) {
+function installPlugin($key, $enable = 0) {
 
     $objQuery =& SC_Query_Ex::getSingletonInstance();
     $objQuery->begin();
@@ -83,6 +88,19 @@ function installPlugin($key) {
     $arrErr = $objOwner->execPlugin($plugin, $plugin['class_name'], 'install');
     if ($objOwner->isError($arrErr) === true) {
         return $arrErr;
+    }
+
+    if ($enable == true) {
+        $arrErr = $objOwner->enablePlugin($plugin);
+        if ($objOwner->isError($arrErr) === false) {
+            // TODO 全プラグインのインスタンスを保持したまま後続処理が実行されるので、全てのインスタンスを解放する。
+            unset($GLOBALS['_SC_Helper_Plugin_instance']);
+            // コンパイルファイルのクリア処理
+            SC_Utils_Ex::clearCompliedTemplate();
+            //$this->tpl_onload = "alert('" . $plugin['plugin_name'] . "を有効にしました。');";
+        } else {
+            return $arrErr;
+        }
     }
 
     $objQuery->commit();
